@@ -1,14 +1,23 @@
 [CmdletBinding()]
 param(
-    [Parameter(Mandatory = $true)]
-    [string]$ConnectionName
+    [Parameter(Position = 0)]
+    [string]$ConnectionName = (-join [char[]](0x5bbd, 0x5e26, 0x8fde, 0x63a5))
 )
 
 $ErrorActionPreference = "Stop"
 $identity = [Security.Principal.WindowsIdentity]::GetCurrent()
 $principalCheck = New-Object Security.Principal.WindowsPrincipal($identity)
+
 if (-not $principalCheck.IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)) {
-    throw "Run this installer as administrator."
+    $psExe = Join-Path $env:SystemRoot "System32\WindowsPowerShell\v1.0\powershell.exe"
+    $argList = @(
+        "-NoProfile",
+        "-ExecutionPolicy", "Bypass",
+        "-File", $PSCommandPath,
+        "-ConnectionName", $ConnectionName
+    )
+    Start-Process -FilePath $psExe -ArgumentList $argList -Verb RunAs -Wait
+    exit 0
 }
 
 $credentialFile = Join-Path $env:LOCALAPPDATA "BroadbandAutoConnect\credential.xml"
@@ -42,3 +51,4 @@ Register-ScheduledTask `
     -Force | Out-Null
 
 Write-Host "Scheduled task installed: $taskName"
+Write-Host "Connection profile: $ConnectionName"

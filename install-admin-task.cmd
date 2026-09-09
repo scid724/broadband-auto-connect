@@ -1,14 +1,10 @@
 @echo off
+setlocal
 cd /d "%~dp0"
-set "CONNECTION_NAME=%~1"
-if "%CONNECTION_NAME%"=="" set "CONNECTION_NAME=宽带连接"
-
-net session >nul 2>&1
-if not "%errorlevel%"=="0" (
-  echo Requesting administrator permission...
-  powershell.exe -NoProfile -Command "Start-Process -FilePath '%~f0' -ArgumentList '%CONNECTION_NAME%' -Verb RunAs"
-  exit /b
+powershell.exe -NoProfile -ExecutionPolicy Bypass -File "%~dp0scripts\install-admin-task.ps1" %*
+if errorlevel 1 (
+  echo Installation failed. Keep this window open and send the error text.
+) else (
+  echo Installation succeeded. Restart Windows to test.
 )
-
-powershell.exe -NoProfile -ExecutionPolicy Bypass -File ".\scripts\install-admin-task.ps1" -ConnectionName "%CONNECTION_NAME%"
 pause
