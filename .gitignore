@@ -1,0 +1,15 @@
+# Local credentials and runtime logs
+credential.xml
+*.log
+BroadbandAutoConnect/
+
+# Windows/user-specific files
+Thumbs.db
+Desktop.ini
+*.lnk
+
+# Editor and build artifacts
+.vscode/
+.idea/
+*.user
+*.tmp
